@@ -43,11 +43,11 @@ function indexByTag(cards) { // 这里参数也叫 cards，它是函数的“局
         // 1) 如果 index[tag] 还不存在，先创建一个空数组
         // index 是对象, tag 是变量（比如 "event"）, index[tag] 表示：访问对象里“键名为 tag 的那一项”
         // 这一步的意义：做“分类桶”，每个 tag 要对应一个数组。 第一次遇到这个 tag，要先开桶。
-        if (!index[tag]) index[tag] = [];
+        if (!(tag in index)) index[tag] = []; //if the key doesn’t exist, initialize an empty array
 
         // 2) 把当前卡片 push 进去
         index[tag].push(c);
-        
+
         console.log("tag =", tag, "after:", index[tag]);
     }
   return index;  
@@ -58,5 +58,6 @@ const idx = indexByTag(cards);
 console.log(idx);
 // 语法点：Object.keys(obj) - 返回对象所有键名组成的数组
 console.log(Object.keys(idx));      // 例如：["event","page","grid"]
+console.log(Object.values(idx));     
 console.log(idx.event);             // 输出 event 的卡片数组
 console.log(idx.page);              // 输出 page 的卡片数组
