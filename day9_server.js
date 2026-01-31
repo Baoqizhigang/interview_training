@@ -11,12 +11,22 @@ const { URL } = require("url");
 const { cards, getCardsByTagFast } = require("./lib/cardsIndex");
 
 function sendJson(res, statusCode, data) { // res 是 Node 的“响应对象”，用它把数据回给浏览器/客户端
-  const body = JSON.stringify(data); // JSON.stringify(data)：把 JS 对象/数组变成字符串（因为网络上传的是文本/字节）
+  // const body = JSON.stringify(data); // JSON.stringify(data)：把 JS 对象/数组变成字符串（因为网络上传的是文本/字节）
+
+  let body = JSON.stringify(data);
+
+  // 
+  if (body === undefined) {
+    statusCode = 500;
+    body = JSON.stringify({ error: "Internal Server Error: data is undefined" });
+  }
+
   res.writeHead(statusCode, {  // writeHead：设置 HTTP 状态码 + 响应头
     "Content-Type": "application/json", // Content-Type：告诉浏览器“我发的是 JSON”
     "Content-Length": Buffer.byteLength(body), // Content-Length：告诉浏览器“我发了多少字节”（有些客户端依赖它）
   }); 
   res.end(body); //res.end(body)：真正把内容发出去，并结束这次请求
+
 }
 
 //每次有人访问你的服务器，Node 就会调用这个回调函数: req 是“请求”（对方要什么）; res 是“响应”（你要回什么）
@@ -50,9 +60,9 @@ const server = http.createServer((req, res) => {
             pathname === "/cards" ✅
             tag = null（因为没 query）
         跳过 if (tag)
-        执行：sendJson(res, 200, cards)
-        但 cards 如果是 undefined → JSON.stringify(undefined) → undefined → Buffer.byteLength 崩溃 */
-    return sendJson(res, 200, cards);
+        执行：sendJson(res, 200, undefined)
+        练习：故意传 undefined，看 sendJson 会不会崩 */
+    return sendJson(res, 200, undefined);
   }
 
     // 兜底 404: 访问其它路径，比如 /abc，就返回 404
