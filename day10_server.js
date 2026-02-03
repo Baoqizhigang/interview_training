@@ -1,10 +1,11 @@
 // day10_server.js
 const http = require("http");
 const { URL } = require("url");
+
+const { cards, getCardsByTagFast, getAllTags } = require("./lib/cardsIndex");
 const { sendJson } = require("./lib/sendJson");
 
-// 你暂时继续用这个“故意 undefined”测试
-const cards = undefined;
+
 
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, "http://localhost:3000");
@@ -12,6 +13,11 @@ const server = http.createServer((req, res) => {
   if (req.method !== "GET") {
     return sendJson(res, 405, { error: "Method Not Allowed" });
   }
+
+  if (url.pathname === "/tags") {
+    return sendJson(res, 200, getAllTags());
+  }
+
 
   if (url.pathname === "/cards") {
     const tag = url.searchParams.get("tag");
